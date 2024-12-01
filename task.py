@@ -3,7 +3,6 @@ from typing import Union
 from utils.log_utils import get_logger
 
 
-
 class Task:
 
     def __init__(self, id, available_channels, bandwidth, start_time, 
