@@ -1,8 +1,8 @@
-
 import logging
-from utils.log_utils import get_logger
 from typing import Union
+
 from task import AllocatedTask
+from utils.log_utils import get_logger
 
 
 class OccupiedInfo:
@@ -13,16 +13,19 @@ class OccupiedInfo:
         self.occupied_bandwidth = occupied_bandwidth
 
     def __repr__(self) -> str:
-        return f"Task ID: {self.task_id}, \
+        return f'Task ID: {self.task_id}, \
                 occupied period: {self.occupied_period}, \
-                occupied bandwidth: {self.occupied_bandwidth}"
+                occupied bandwidth: {self.occupied_bandwidth}'
 
 
 class Channel:
 
-    def __init__(self, id: int, bandwidth: int, 
-                 allocated_tasks: list, t_max: int = 90,
-                 price: int = 0, 
+    def __init__(self,
+                 id: int,
+                 bandwidth: int,
+                 allocated_tasks: list,
+                 t_max: int = 90,
+                 price: int = 0,
                  logger: Union[None, str, logging.Logger] = None) -> None:
         self.id = id
         self.bandwidth = bandwidth
@@ -30,29 +33,29 @@ class Channel:
         self.t_max = t_max
         self.price = price
         self.logger = get_logger(logger)
-    
+
     def __repr__(self) -> str:
-        return f"Channel ID: {self.id}, channel bandwidth: {self.bandwidth}"
-    
+        return f'Channel ID: {self.id}, channel bandwidth: {self.bandwidth}'
+
     def allocate_task(self, task):
         if task.bandwidth > self.bandwidth or task.end_time > self.t_max:
-            self.logger.error(f"Cannot allocate task {task.id}")
+            self.logger.error(f'Cannot allocate task {task.id}')
             return False
         else:
-            # loop all the available frequency to find the available solution 
+            # loop all the available frequency to find the available solution
             # with minimum fragmentation
             frag_levels = []
             start_freq_candidates = []
             for b in range(self.bandwidth - task.bandwidth):
                 # check if there is occuption in the given time
-                if not self.is_occupied(b, b + task.bandwidth, 
-                                        task.start_time, task.end_time):
+                if not self.is_occupied(b, b + task.bandwidth, task.start_time,
+                                        task.end_time):
                     # create a new allocated task
                     new_allocated_task = AllocatedTask(
                         task.id,
                         available_channels=[self.id],
-                        start_freq=b, 
-                        end_freq=b+task.bandwidth,
+                        start_freq=b,
+                        end_freq=b + task.bandwidth,
                         start_time=task.start_time,
                         end_time=task.end_time,
                         priority=task.priority,
@@ -67,11 +70,13 @@ class Channel:
                     task.is_assigned = False
                     start_freq_candidates.append(b)
             if start_freq_candidates == []:
-                self.logger.info(f"Task {task.id} cannot be allocated in channel {self.id}.")
+                self.logger.info(
+                    f'Task {task.id} cannot be allocated in channel {self.id}.'
+                )
                 return False
             else:
-                min_idx = min(range(len(frag_levels)), 
-                              key=frag_levels.__getitem__)
+                min_idx = min(
+                    range(len(frag_levels)), key=frag_levels.__getitem__)
                 start_freq = start_freq_candidates[min_idx]
                 new_allocated_task = AllocatedTask(
                     task.id,
@@ -84,11 +89,12 @@ class Channel:
                     bid=task.bid)
                 self.allocated_tasks.append(new_allocated_task)
                 task.is_assigned = True
-                self.logger.info(f"Task {task.id} is allocated in channel {self.id} \
-                                 start time: {new_allocated_task.start_time}, \
-                                 end time: {new_allocated_task.end_time}, \
-                                 start frequency: {new_allocated_task.start_freq}, \
-                                 end_frequency: {new_allocated_task.end_freq}")
+                self.logger.info(
+                    f'Task {task.id} is allocated in channel {self.id} ' +
+                    f'start time: {new_allocated_task.start_time},' +
+                    f'end time: {new_allocated_task.end_time},' +
+                    f'start frequency: {new_allocated_task.start_freq},' +
+                    f'end_frequency: {new_allocated_task.end_freq}')
                 return True
 
     def is_occupied(self, start_freq, end_freq, start_time, end_time):
@@ -99,7 +105,7 @@ class Channel:
             if do_rectangles_intersect(target_area, task_area):
                 return True
         return False
-    
+
     def calculate_priority_gain(self, task):
         if not task.is_assigned:
             if self.allocate_task(task):
@@ -109,11 +115,10 @@ class Channel:
                 return 0
         else:
             return 0  # should not return the same value as 0 gain
-    
+
     def compute_fragmentation(self):
-        """compute the area of a bounding box which can contain all
-           the tasks in the channel
-        """
+        """compute the area of a bounding box which can contain all the tasks
+        in the channel."""
         x_values = []
         y_values = []
         if self.allocated_tasks != []:
@@ -131,10 +136,10 @@ class Channel:
             return area
         else:
             return 0
-        
+
     def get_channel_capacity(self):
         return self.t_max * self.bandwidth
-    
+
     def get_occupied_resource(self):
         if self.allocated_tasks != []:
             occupied_resource = 0
@@ -143,7 +148,7 @@ class Channel:
             return occupied_resource
         else:
             return 0
-    
+
     def get_occupation_rate(self):
         occupied_resource = self.get_occupied_resource()
         channel_capacity = self.get_channel_capacity()
@@ -165,7 +170,8 @@ def do_rectangles_intersect(A, B):
     # A is (A_x1, A_y1, A_x2, A_y2)
     # B is (B_x1, B_y1, B_x2, B_y2)
 
-    # Check if one rectangle is completely to the left, right, above, or below the other
+    # Check if one rectangle is completely to the left, right, above,
+    # or below the other
     if A[2] <= B[0] or B[2] <= A[0]:  # One is to the left of the other
         return False
     if A[3] <= B[1] or B[3] <= A[1]:  # One is below the other
