@@ -58,9 +58,6 @@ jobs:
       - name: Check merge conflicts
         run: pre-commit run check-merge-conflict --all-files
 
-      - name: Fix encoding pragma
-        run: pre-commit run fix-encoding-pragma --all-files
-
       - name: Mixed line endings fixer
         run: pre-commit run mixed-line-ending --all-files
 

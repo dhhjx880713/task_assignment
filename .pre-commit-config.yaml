@@ -32,7 +32,6 @@ repos:
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
       - id: check-merge-conflict
-        args: ["--remove"]
       - id: mixed-line-ending
         args: ["--fix=lf"]
   - repo: https://github.com/codespell-project/codespell
