@@ -39,9 +39,9 @@ repos:
     hooks:
       - id: codespell
         args: ["--ignore-words-list", "ue"]
-  - repo: https://github.com/myint/docformatter.git
-    rev: v1.3.1
-    hooks:
-      - id: docformatter
-        language: python
-        args: ["--in-place", "--wrap-descriptions", "79"]
+  # - repo: https://github.com/myint/docformatter.git
+  #   rev: v1.3.1
+  #   hooks:
+  #     - id: docformatter
+  #       language: python
+  #       args: ["--in-place", "--wrap-descriptions", "79"]
