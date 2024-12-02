@@ -31,7 +31,7 @@ jobs:
         run: flake8 .
 
       - name: Seed isort config
-        run: seed-isort-config --settings-path=./
+        run: python -m seed_isort_config --settings-path=./
 
       - name: Run isort
         run: isort --settings-file=./setup.cfg .
