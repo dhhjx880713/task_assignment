@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 seed-isort-config isort yapf docformatter codespell pre-commit
+          pip install flake8 seed-isort-config isort yapf codespell pre-commit
 
       - name: Run Flake8
         run: flake8 .
@@ -63,6 +63,3 @@ jobs:
 
       - name: Run codespell
         run: codespell --ignore-words-list="ue"
-
-      - name: Format docstrings with docformatter
-        run: docformatter --in-place --wrap-descriptions 79 .
