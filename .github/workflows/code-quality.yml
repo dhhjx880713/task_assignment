@@ -1,0 +1,72 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  lint:
+    name: Lint and Format Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9  # Adjust to your project's Python version
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 isort yapf docformatter codespell pre-commit
+
+      - name: Run Flake8
+        run: flake8 .
+
+      - name: Seed isort config
+        run: seed-isort-config --settings-path=./
+
+      - name: Run isort
+        run: isort --settings-file=./setup.cfg .
+
+      - name: Run YAPF
+        run: yapf -ir .
+
+      - name: Run trailing whitespace fixer
+        run: |
+          find . -type f ! -path "./tests/data/*" -exec sed -i 's/[ \t]*$//' {} +
+
+      - name: Check YAML files
+        run: pre-commit run check-yaml --all-files
+
+      - name: Ensure end-of-file fixer
+        run: pre-commit run end-of-file-fixer --all-files
+
+      - name: Requirements.txt fixer
+        run: pre-commit run requirements-txt-fixer --all-files
+
+      - name: Double quote string fixer
+        run: pre-commit run double-quote-string-fixer --all-files
+
+      - name: Check merge conflicts
+        run: pre-commit run check-merge-conflict --all-files
+
+      - name: Fix encoding pragma
+        run: pre-commit run fix-encoding-pragma --all-files
+
+      - name: Mixed line endings fixer
+        run: pre-commit run mixed-line-ending --all-files
+
+      - name: Run codespell
+        run: codespell --ignore-words-list="ue"
+
+      - name: Format docstrings with docformatter
+        run: docformatter --in-place --wrap-descriptions 79 .
